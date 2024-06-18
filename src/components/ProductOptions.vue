@@ -114,14 +114,8 @@ export default {
     }
 
     .options-container {
-      /* the slides */
       .slick-slide {
         margin: 0 120px;
-      }
-
-      /* the parent */
-      .slick-list {
-        margin: 0 -120px;
       }
 
       .option {

@@ -105,5 +105,25 @@ export default {
   .wrapper-contract-phases {}
 }
 
-@media (max-width: 500px) {}
+@media (max-width: 500px) {
+  .wrapper-contract-phases {
+    margin-top: 70px;
+    .contract-phases-content {
+      .title {
+        text-align: center;
+      }
+      .items {
+        flex-direction: column;
+
+        .item {
+          &:first-child {
+            .title {
+              padding-left: 45px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
 </style>

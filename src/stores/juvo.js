@@ -17,6 +17,9 @@ export const useJuvo = defineStore('juvo', {
     brand: null,
     loadingModels: false,
     disableModels: true,
+    juvoAdditionalFormData: null,
+    juvoBankList: null,
+    juvoStateList: null,
   }),
   actions: {
     setBrand(value) {
@@ -125,9 +128,40 @@ export const useJuvo = defineStore('juvo', {
         console.error('Erro ao obter lista de marcas disponíveis:', error)
       }
     },
+    async getBanksList() {
+      try {
+        const response = await fetch(`${baseUrl}/auxiliary/banks`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${this.token}`
+          },
+        })
+
+        const { data } = await response.json()
+        this.juvoBankList = data;
+      } catch (error) {
+        console.error('Erro ao obter lista de bancos disponíveis:', error)
+      }
+    },
+    async getStateList() {
+      try {
+        const response = await fetch(`${baseUrl}/auxiliary/provinceOptions`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${this.token}`
+          },
+        })
+
+        const { data } = await response.json()
+        this.juvoStateList = data;
+      } catch (error) {
+        console.error('Erro ao obter lista de estados disponíveis:', error)
+      }
+    },
     async sendForm({ formData }) {
-      this.juvoLoading = true
-      console.log(formData)
+      this.juvoLoading = true;
 
       const requestData = {
         full_name: formData.nome,
@@ -160,7 +194,55 @@ export const useJuvo = defineStore('juvo', {
         })
 
         this.juvoData = await response.json();
-        console.log(this.juvoData);
+
+        if (this.juvoData?.isSuccess === false && this.juvoData?.message.includes('Este telefone já está cadastrado em nosso sistema. Por favor faça o login ou recupere sua senha.')) {
+          alert('Este telefone já está cadastrado em nosso sistema. Por favor faça o login ou recupere sua senha.');
+        }
+
+        if (this.juvoData?.isSuccess === false && this.juvoData?.message.includes('Este CPF já está vinculado a outro e-mail')) {
+          alert('Este CPF já está vinculado a outro e-mail, Por favor, entre em contato com nosso atendimento para atualizar seus dados.')
+        }
+
+        if (this.juvoData?.validationErrors?.body?.cpf_number?._errors?.length > 0) {
+          alert('Por favor preencha um CEP válido.');
+        }
+
+        if(this.juvoData?.isSuccess === false && this.juvoData?.message.includes('Esse cpf e email já estão registrados')) {
+          alert('Esse CPF e E-mail já estão registrados em nosso sistema')
+        }
+
+        if(this.juvoData?.isSuccess === false && this.juvoData?.message.includes('CPF')) {
+          alert('CPF Inválido')
+        }
+
+
+        if (this.juvoData?.validationErrors?.body?.address_postal_code?._errors?.length > 0) {
+          alert('Por favor preencha um CEP válido.');
+        }
+      } catch (error) {
+        this.juvoError = true
+        console.error('Erro ao enviar o formulário:', error)
+        alert('Erro ao enviar o formulário. Tente novamente.')
+      } finally {
+        this.juvoLoading = false
+      }
+    },
+    async sendAdditionalFormData({ additionalFormData }) {
+      this.juvoLoading = true;
+
+      try {
+        const response = await fetch(`${baseUrl}/v2/simulation/save-additional-customer-info?partner=igoal`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${this.token}`
+          },
+          body: JSON.stringify(additionalFormData)
+        })
+
+        this.juvoAdditionalFormData = await response.json();
+
+        return this.juvoAdditionalFormData.isSuccess;
       } catch (error) {
         this.juvoError = true
         console.error('Erro ao enviar o formulário:', error)

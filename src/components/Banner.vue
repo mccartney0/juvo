@@ -12,7 +12,7 @@
         </div>
       </div>
 
-      <div class="form" id="simule-agora" :class="step === 3 ? 'd-none' : ''">
+      <div class="form" id="simule-agora" :class="step === 3 || step === 4 ? 'd-none' : ''">
         <div class="title mb-4 text-center">Solicitação de Crédito</div>
 
         <!-- Steps Indicator -->
@@ -34,7 +34,7 @@
             <div class="mb-3">
               <input class="form-control p-2" id="nome" v-model="formData.nome" type="text" placeholder="Nome"
                 required />
-              <div v-if="!isNameValid && formData.nome !== ''" class="text-danger">Nome deve ter ao menos duas palavras.
+              <div v-if="!isNameValid && formData.nome !== ''" class="text-danger">Nome inválido.
               </div>
             </div>
 
@@ -54,16 +54,16 @@
             <div v-if="!isCpfValid && formData.cpf !== ''" class="text-danger">CPF inválido.</div>
 
             <div class="input-group mb-3">
-              <input class="form-control p-2" v-model="formData.birthdate" id="birthdate" type="date"
-                placeholder="Data de nascimento" required />
+              <input class="form-control p-2" v-model="formData.birthdate" id="birthdate" type="text"
+                placeholder="Data de nascimento" @input="mascaraData" maxlength="10" required />
 
               <input class="form-control p-2" id="address_postal_code" v-model="formData.address_postal_code" type="tel"
-                placeholder="CEP" maxlength="8" required />
+                placeholder="CEP" maxlength="9" @input="mascaraCEP" required />
             </div>
 
             <div class="input-group mb-3">
               <input class="form-control p-2" v-model="formData.renda" id="renda" type="text" placeholder="Renda"
-                @input="mascaraRenda" required />
+                maxlength="11" @input="mascaraRenda" required />
             </div>
 
             <div class="button-container d-flex justify-content-center">
@@ -92,6 +92,7 @@
                 <label for="politically_exposed_person">Você é uma pessoa politicamente exposta?</label>
                 <select class="form-select" id="politically_exposed_person"
                   v-model="formData.politically_exposed_person" required>
+                  <option value="" disabled>Selecionar</option>
                   <option :value="true">Sim</option>
                   <option :value="false">Não</option>
                 </select>
@@ -99,9 +100,8 @@
             </div>
 
             <div class="d-flex flex-column gap-2 mb-3">
-              <label for="professional_class_id">Área de Atuação</label>
               <select class="form-select" id="professional_class_id" v-model="formData.professional_class_id" required>
-                <option value="" disabled>Selecionar</option>
+                <option value="" disabled>Área de Atuação</option>
                 <option v-for="(juvoProfession, index) in juvoProfessionList" :key="index" :value="juvoProfession.id">
                   {{ juvoProfession.value }}
                 </option>
@@ -115,10 +115,9 @@
 
               <div class="input-group mb-3 d-flex gap-3 justify-content-between">
                 <div class="device-brand d-flex flex-column gap-2 justify-content-between">
-                  <label for="device_brand">Marca</label>
                   <select class="form-select" id="device_brand" v-model="formData.device.brand"
                     @change="setBrand(formData.device.brand)" required>
-                    <option value="" disabled>Selecionar</option>
+                    <option value="" disabled>Marca</option>
                     <option v-for="(juvoDeviceBrand, index) in juvoDeviceBrands" :key="index"
                       :value="juvoDeviceBrand.id">
                       {{ juvoDeviceBrand.value }}
@@ -127,10 +126,9 @@
                 </div>
 
                 <div class="device-model d-flex flex-column gap-2 justify-content-between">
-                  <label for="device_model">Modelo</label>
                   <select :disabled="disableModels" :loading="loadingModels" class="form-select" id="device_model"
                     v-model="formData.device.model" required>
-                    <option value="" disabled>Selecionar</option>
+                    <option value="" disabled>Modelo</option>
                     <option v-for="(model, index) in juvoDeviceModels" :key="index" :value="model.commercialCode">
                       {{ model.commercialName }}
                     </option>
@@ -171,12 +169,131 @@
 
             <span>Enviando informaçoes...</span>
           </div>
+        </form>
+      </div>
 
-          <!-- Step 3 -->
-          <div v-if="step === 3">
+      <!-- Step 3 Additional data -->
+      <div v-if="step === 3" class="form additional-form-data" :class="step === 3 ? 'd-flex' : 'd-none'">
+        <div v-if="!juvoData?.data?.propositions?.offers && !juvoData?.data?.propositions?.offers.length > 0"
+          class="offers d-flex flex-column gap-2 align-items-center">
+          <span class="fs-2 text-center">
+            Melhor oferta disponível
+          </span>
+
+          <div class="offer-details d-flex gap-5">
+            <div class="first-value">
+              <div class="fs-6 text-center">Quantidade de Parcelas: <b style="color:#dd3e84">{{
+                juvoData?.data?.propositions?.offers[0]?.installmentQuantity }}</b>
+              </div>
+              <div class="fs-6 text-center">Taxa de Juros (%): <b style="color:#dd3e84">{{
+                juvoData?.data?.propositions?.offers[0]?.rateInPercentage }}%</b></div>
+            </div>
+            <div class="second-value">
+              <div class="fs-6 text-center">Valor Mínimo do Empréstimo: R$ <b style="color:#dd3e84">{{
+                juvoData?.data?.propositions?.offers[0]?.minLoanAmount.toFixed(2) }}</b></div>
+              <div class="fs-6 text-center">Valor Máximo do Empréstimo: R$ <b style="color:#dd3e84">{{
+                juvoData?.data?.propositions?.offers[0]?.maxLoanAmount.toFixed(2) }}</b></div>
+            </div>
+          </div>
+        </div>
+
+        <form @submit.prevent="submitAdditionalData({ additionalFormData })">
+          <div class="form-data">
+            <div class="input-group mb-3">
+              <input class="form-control p-2" id="documentNumber" v-model="additionalFormData.documentNumber"
+                type="text" placeholder="CPF" required />
+
+              <input class="form-control p-2" id="payday" v-model="additionalFormData.payday" type="number" min="1"
+                max="30" placeholder="Dia do pagamento" required />
+            </div>
+
+
+            <div class="input-group mb-3">
+              <select class="form-select p-2" id="type" v-model="additionalFormData.bankDetails.bankCode" required>
+                <option value="" disabled>Banco</option>
+                <option v-for="(banco, index) in juvoBankList" :key="index" :value="banco.code">
+                  {{ banco.value }}
+                </option>
+              </select>
+
+              <select class="form-select p-2" id="type" v-model="additionalFormData.bankDetails.type" required>
+                <option value="" disabled>Tipo de conta</option>
+                <option value="CHECKING">Conta Corrente</option>
+                <option value="SAVINGS">Conta Poupança</option>
+              </select>
+            </div>
+
+            <div class="input-group mb-3">
+              <input class="form-control p-2" id="accountNumber" v-model="additionalFormData.bankDetails.accountNumber"
+                type="text" placeholder="Número da conta" required />
+              <input class="form-control p-2" id="agencyNumber" v-model="additionalFormData.bankDetails.agencyNumber"
+                type="text" placeholder="Agência" required />
+            </div>
+
+            <div class="mb-3">
+              <input class="form-control p-2" id="owner" v-model="additionalFormData.bankDetails.owner" type="text"
+                placeholder="Proprietário" required />
+            </div>
+
+            <div class="input-group mb-3">
+              <select class="form-select p-2" id="type" v-model="additionalFormData.address.state" required>
+                <option value="" disabled>Estado</option>
+                <option v-for="(estado, index) in juvoStateList" :key="index" :value="estado.uf">
+                  {{ estado.value }}
+                </option>
+              </select>
+              <input class="form-control p-2" id="city" v-model="additionalFormData.address.city" type="text"
+                placeholder="Cidade" required />
+            </div>
+
+            <div class="mb-3">
+              <input class="form-control p-2" id="address" v-model="additionalFormData.address.address" type="text"
+                placeholder="Endereço" required />
+            </div>
+
+            <div class="input-group mb-3">
+              <input class="form-control p-2" id="postalCode" v-model="additionalFormData.address.postalCode"
+                type="text" placeholder="CEP" required />
+              <input class="form-control p-2" id="neighborhood" v-model="additionalFormData.address.neighborhood"
+                type="text" placeholder="Bairro" required />
+              <input class="form-control p-2" id="number" v-model="additionalFormData.address.number" type="text"
+                placeholder="Número" required />
+            </div>
+
+            <div class="mb-3">
+              <select class="form-select p-2" id="educationLevel"
+                v-model="additionalFormData.personalInfo.educationLevel" required>
+                <option value="" disabled>Nível de Educação</option>
+                <option value="1">Ensino Fundamental</option>
+                <option value="2">Ensino Médio</option>
+                <option value="3">Ensino superior</option>
+                <option value="4">Mestrado</option>
+                <option value="5">Doutorado</option>
+                <option value="6">Pós-Graduação</option>
+              </select>
+            </div>
+
+            <div class="input-group mb-3">
+              <select class="form-select p-2" id="maritalStatus" v-model="additionalFormData.personalInfo.maritalStatus"
+                required>
+                <option value="" disabled>Estado Civil</option>
+                <option v-for="(juvoMaritalStatus, index) in juvoMaritalStatusList" :key="index"
+                  :value="juvoMaritalStatus.id">
+                  {{ juvoMaritalStatus.value }}
+                </option>
+              </select>
+
+              <select class="form-select p-2" id="gender" v-model="additionalFormData.personalInfo.gender" required>
+                <option value="" disabled>Gênero</option>
+                <option value="MALE">Masculino</option>
+                <option value="FEMALE">Feminino</option>
+                <option value="OUTRO">Outro</option>
+              </select>
+            </div>
+
             <div class="button-container d-flex justify-content-center">
-              <button class="btn submit-btn text-white border-0" :disabled="loading">
-                <span v-if="!juvoLoading">Simule agora</span>
+              <button class="btn submit-btn text-white border-0" :disabled="juvoLoading">
+                <span v-if="!juvoLoading">Contratar</span>
 
                 <div v-if="juvoLoading" class="spinner-border spinner-border-sm" role="status">
                   <span class="visually-hidden">Loading...</span>
@@ -187,8 +304,8 @@
         </form>
       </div>
 
-      <!-- Step 3 -->
-      <div class="form success-form" :class="step === 3 ? 'd-flex' : 'd-none'">
+      <!-- Step 4 Sucesso -->
+      <div class="form success-form" :class="step === 4 ? 'd-flex' : 'd-none'">
         <div class="upper-title">
           Enviado com sucesso.
         </div>
@@ -221,10 +338,10 @@ export default {
         cpf: '',
         renda: '',
         birthdate: '',
-        professional_class_id: null,
-        marital_status_id: null,
+        professional_class_id: '',
+        marital_status_id: '',
         address_postal_code: '',
-        politically_exposed_person: null,
+        politically_exposed_person: '',
         terms: false,
         device: {
           model: '',
@@ -233,12 +350,36 @@ export default {
           os_version: ''
         },
       },
+      additionalFormData: {
+        documentNumber: '',
+        payday: null,
+        bankDetails: {
+          accountNumber: '',
+          agencyNumber: '',
+          bankCode: '',
+          owner: '',
+          type: ''
+        },
+        address: {
+          address: '',
+          city: '',
+          neighborhood: '',
+          number: '',
+          postalCode: '',
+          state: '',
+        },
+        personalInfo: {
+          educationLevel: '',
+          maritalStatus: '',
+          gender: ''
+        }
+      },
       loading: false,
       token: null,
     };
   },
   computed: {
-    ...mapState(useJuvo, ['juvoData', 'juvoLoading', 'juvoError', 'juvoProfessionList', 'juvoMaritalStatusList', 'juvoDeviceInfo', 'juvoDeviceModels', 'juvoDeviceBrands', 'brand', 'loadingModels', 'disableModels']),
+    ...mapState(useJuvo, ['juvoData', 'juvoLoading', 'juvoError', 'juvoProfessionList', 'juvoMaritalStatusList', 'juvoDeviceInfo', 'juvoDeviceModels', 'juvoDeviceBrands', 'brand', 'loadingModels', 'disableModels', 'juvoBankList', 'juvoStateList', 'juvoAdditionalFormData']),
     brand: {
       get() {
         return this.brand;
@@ -251,7 +392,7 @@ export default {
       return this.step >= 2 ? 100 : this.step === 1 ? 50 : 0;
     },
     isNameValid() {
-      return this.formData.nome.trim().split(' ').length >= 2;
+      return /^[a-zA-ZÀ-ÿ ]+$/.test(this.formData.nome) && this.formData.nome.trim().split(' ').length >= 2;
     },
     isEmailValid() {
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -273,7 +414,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(useJuvo, ['getToken', 'getProfessionalList', 'getMaritalStatus', 'getDeviceInfo', 'getDeviceModels', 'getDeviceBrands', 'setBrand', 'sendForm']),
+    ...mapActions(useJuvo, ['getToken', 'getProfessionalList', 'getMaritalStatus', 'getDeviceInfo', 'getDeviceModels', 'getDeviceBrands', 'setBrand', 'sendForm', 'getBanksList', 'getStateList', 'sendAdditionalFormData']),
     nextStep() {
       this.step++;
     },
@@ -304,11 +445,14 @@ export default {
       this.formData.celular = formattedCelular;
     },
     mascaraRenda() {
-      let formattedRenda = this.formData.renda;
+      let value = this.formData.renda.replace(/\D/g, ''); // Remove todos os não dígitos
 
-      formattedRenda = formattedRenda.replace(/\D/g, "");
+      value = Number(value / 100).toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+      });
 
-      this.formData.renda = formattedRenda;
+      this.formData.renda = value;
     },
     mascaraCPF() {
       let formattedCPF = this.formData.cpf;
@@ -329,13 +473,80 @@ export default {
 
       this.formData.cpf = formattedCPF;
     },
+    mascaraCEP(event) {
+      let value = event.target.value.replace(/\D/g, '');
+      value = value.replace(/(\d{5})(\d)/, '$1-$2');
+      this.formData.address_postal_code = value;
+    },
+    mascaraData(event) {
+      let value = event.target.value.replace(/\D/g, '');
+
+      value = value.replace(/(\d{2})(\d)/, '$1/$2');
+      value = value.replace(/(\d{2})(\d)/, '$1/$2');
+
+      if (value.length > 10) {
+        value = value.slice(0, 10);
+      }
+
+      this.formData.birthdate = value;
+
+      this.validarData();
+    },
+    validarData() {
+      let parts = this.formData.birthdate.split('/');
+      if (parts.length === 3) {
+        let day = parseInt(parts[0], 10);
+        let month = parseInt(parts[1], 10);
+        let year = parts[2];
+
+        // Verifica se o ano possui exatamente 4 dígitos
+        if (year.length === 4) {
+          year = parseInt(year, 10);
+
+          const maxDay = 31;
+          const maxMonth = 12;
+          let today = new Date();
+
+          // Validar o dia e mês
+          if (day < 1 || day > maxDay || month < 1 || month > maxMonth) {
+            day = Math.min(Math.max(day, 1), maxDay);
+            month = Math.min(Math.max(month, 1), maxMonth);
+
+            this.formData.birthdate = `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
+          }
+
+          let minYear = today.getFullYear() - 100;
+
+          // Verificar se o ano está dentro dos limites permitidos
+          if (year < minYear || year > today.getFullYear()) {
+            alert('Por favor, insira um ano válido')
+            this.formData.birthdate = '';
+          }
+
+          let minDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+          let selectedDate = new Date(year, month - 1, day);
+
+          // Verifica se a data é válida (idade mínima de 18 anos)
+          if (selectedDate >= today || selectedDate <= new Date(today.getFullYear() - 100, today.getMonth(), today.getDate())) {
+            this.formData.birthdate = '';
+
+            if (selectedDate >= today) {
+              alert('A data de nascimento não pode ser posterior à data atual.');
+            }
+          } else if (selectedDate >= minDate) {
+            this.formData.birthdate = '';
+
+            alert('Empréstimos disponíveis apenas para maiores de 18 anos');
+          }
+        }
+      }
+    },
     validateAll() {
       const validations = {
         name: this.isNameValid,
         email: this.isEmailValid,
         celular: this.isCelularValid,
         cpf: this.isCpfValid,
-        // Adicione outras validações aqui...
       };
 
       const isValid = Object.values(validations).every(value => value);
@@ -344,24 +555,49 @@ export default {
       }
       return isValid;
     },
+    formatarDataParaEnvio(data) {
+      const partes = data.split('/');
+      if (partes.length === 3) {
+        const dia = partes[0];
+        const mes = partes[1];
+        const ano = partes[2];
+        return `${ano}-${mes}-${dia}`;
+      }
+      return data;
+    },
     async submitData(formData) {
-      // TODO ajustar calendário para mostrar sempre 18 anos atrás a partir da data de hoje e validar CEP antes de liberar botao para PRÓXIMO
-      // TODO criar form 4 para mostrar as ofertas disponíveis e ir para o form 5 para preencher com dados adicionais
+      this.formData.birthdate = this.formatarDataParaEnvio(this.formData.birthdate);
+      this.formData.renda = this.formData.renda.replace(/\D/g, '');
+
       if (this.validateAll()) {
         await this.sendForm(formData);
 
         const isSuccess = this.juvoData.isSuccess;
-        const hasOffers = this.juvoData.data.status;
+        const hasOffers = this.juvoData.data?.propositions?.offers.length > 0;
 
         if (hasOffers) {
-          this.step = 4; //Tela de Ofertas
+          this.step = 3; //Tela Formulário adicional e ofertas
         } else if (isSuccess) {
-          this.step = 3; //Tela de Sucesso
+          this.step = 4; //Tela de Sucesso
         }
       } else {
         alert('Por favor, preencha suas informações corretamente');
       }
-    }
+    },
+    async submitAdditionalData(additionalFormData) {
+      additionalFormData.additionalFormData.personalInfo.maritalStatus = Number(this.additionalFormData.personalInfo.maritalStatus)
+      additionalFormData.additionalFormData.personalInfo.educationLevel = Number(this.additionalFormData.personalInfo.educationLevel)
+      
+      const isSuccess = await this.sendAdditionalFormData(additionalFormData);
+
+      if (isSuccess && this.juvoAdditionalFormData?.data?.redirectUrl) {
+        window.location.href = this.juvoAdditionalFormData?.data?.redirectUrl;
+      } else if (isSuccess) {
+        this.step = 4;
+      } else {
+        alert('Erro nas informações. Por favor, entre em contato com nosso atendimento para atualizar seus dados')
+      }
+    },
   },
   async mounted() {
     await this.getToken();
@@ -370,26 +606,30 @@ export default {
     this.getMaritalStatus();
     this.getDeviceInfo();
     this.getDeviceBrands();
+    this.getBanksList();
+    this.getStateList();
   },
 };
 </script>
 
 <style lang="scss" scoped>
 ::placeholder {
-  color: #aaaaaa;
+  color: #000;
 }
 
 input[type="text"]:focus,
 input[type="email"]:focus,
 input[type="tel"]:focus,
 input[type="date"]:focus,
+input[type="number"]:focus,
 select:focus {
   border-color: var(--primary-color);
   box-shadow: 0 0 0 0.25rem rgba(221, 62, 131, 0.89);
 }
 
 select option {
-  background: rgba(221, 62, 131, 0.103);
+  background: rgba(255, 255, 255, 0.103);
+  color: #000;
 }
 
 select {
@@ -514,6 +754,19 @@ label.form-check-label:focus,
       }
     }
 
+    .additional-form-data {
+      flex-direction: column;
+      gap: 20px;
+      justify-content: center;
+      align-items: center;
+      height: 816px;
+      margin-top: 300px;
+      position: absolute;
+      width: 100%;
+      left: 50%;
+      transform: translate(-50%);
+    }
+
     .success-form {
       background: #F9CF32;
       flex-direction: column;
@@ -623,6 +876,10 @@ label.form-check-label:focus,
 }
 
 @media (max-width: 500px) {
+  .button-container .btn {
+    font-size: 1rem;
+  }
+
   .labels {
     .subtitle {
       text-align: center;
@@ -630,9 +887,21 @@ label.form-check-label:focus,
   }
 
   .form {
-    height: 720px !important;
-    min-height: 720px !important;
+    height: 660px !important;
+    min-height: 660px !important;
     margin-top: 55px;
+
+    &.additional-form-data {
+      margin-top: 205px !important;
+      height: 900px !important;
+
+      .offers {
+        .offer-details {
+          flex-direction: column;
+          gap: 2px !important;
+        }
+      }
+    }
 
     .select-combo {
       height: auto !important;
@@ -649,10 +918,6 @@ label.form-check-label:focus,
     .device-model {
       width: 45% !important;
     }
-  }
-
-  .wrapper-banner {
-    background-image: url("@/assets/fundo-mulher.png");
   }
 }
 </style>
