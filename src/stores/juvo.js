@@ -19,13 +19,13 @@ export const useJuvo = defineStore('juvo', {
     disableModels: true,
     juvoAdditionalFormData: null,
     juvoBankList: null,
-    juvoStateList: null,
+    juvoStateList: null
   }),
   actions: {
     setBrand(value) {
-      this.brand = value;
-      this.loadingModels = true;
-      this.getDeviceModels();
+      this.brand = value
+      this.loadingModels = true
+      this.getDeviceModels()
     },
     async getToken() {
       try {
@@ -51,11 +51,11 @@ export const useJuvo = defineStore('juvo', {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${this.token}`
-          },
+          }
         })
 
         const { data } = await response.json()
-        this.juvoProfessionList = data;
+        this.juvoProfessionList = data
       } catch (error) {
         console.error('Erro ao obter lista de profissões:', error)
       }
@@ -67,11 +67,11 @@ export const useJuvo = defineStore('juvo', {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${this.token}`
-          },
+          }
         })
 
         const { data } = await response.json()
-        this.juvoMaritalStatusList = data;
+        this.juvoMaritalStatusList = data
       } catch (error) {
         console.error('Erro ao obter lista de estado civil:', error)
       }
@@ -83,12 +83,12 @@ export const useJuvo = defineStore('juvo', {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${this.token}`
-          },
+          }
         })
 
         const { data } = await response.json()
-        this.juvoDeviceInfo = data;
-        this.brand = data.brand;
+        this.juvoDeviceInfo = data
+        this.brand = data.brand
       } catch (error) {
         console.error('Erro ao obter lista de estado civil:', error)
       }
@@ -100,16 +100,16 @@ export const useJuvo = defineStore('juvo', {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${this.token}`
-          },
+          }
         })
 
         const { data } = await response.json()
-        this.juvoDeviceModels = data;
+        this.juvoDeviceModels = data
       } catch (error) {
         console.error('Erro ao obter lista de dispositivos:', error)
       } finally {
-        this.loadingModels = false;
-        this.disableModels = false;
+        this.loadingModels = false
+        this.disableModels = false
       }
     },
     async getDeviceBrands() {
@@ -119,11 +119,11 @@ export const useJuvo = defineStore('juvo', {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${this.token}`
-          },
+          }
         })
 
         const { data } = await response.json()
-        this.juvoDeviceBrands = data;
+        this.juvoDeviceBrands = data
       } catch (error) {
         console.error('Erro ao obter lista de marcas disponíveis:', error)
       }
@@ -135,11 +135,11 @@ export const useJuvo = defineStore('juvo', {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${this.token}`
-          },
+          }
         })
 
         const { data } = await response.json()
-        this.juvoBankList = data;
+        this.juvoBankList = data
       } catch (error) {
         console.error('Erro ao obter lista de bancos disponíveis:', error)
       }
@@ -151,17 +151,17 @@ export const useJuvo = defineStore('juvo', {
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${this.token}`
-          },
+          }
         })
 
         const { data } = await response.json()
-        this.juvoStateList = data;
+        this.juvoStateList = data
       } catch (error) {
         console.error('Erro ao obter lista de estados disponíveis:', error)
       }
     },
     async sendForm({ formData }) {
-      this.juvoLoading = true;
+      this.juvoLoading = true
 
       const requestData = {
         full_name: formData.nome,
@@ -193,31 +193,45 @@ export const useJuvo = defineStore('juvo', {
           body: JSON.stringify(requestData)
         })
 
-        this.juvoData = await response.json();
+        this.juvoData = await response.json()
 
-        if (this.juvoData?.isSuccess === false && this.juvoData?.message.includes('Este telefone já está cadastrado em nosso sistema. Por favor faça o login ou recupere sua senha.')) {
-          alert('Este telefone já está cadastrado em nosso sistema. Por favor faça o login ou recupere sua senha.');
+        if (
+          this.juvoData?.isSuccess === false &&
+          this.juvoData?.message.includes(
+            'Este telefone já está cadastrado em nosso sistema. Por favor faça o login ou recupere sua senha.'
+          )
+        ) {
+          alert(
+            'Este telefone já está cadastrado em nosso sistema. Por favor faça o login ou recupere sua senha.'
+          )
         }
 
-        if (this.juvoData?.isSuccess === false && this.juvoData?.message.includes('Este CPF já está vinculado a outro e-mail')) {
-          alert('Este CPF já está vinculado a outro e-mail, Por favor, entre em contato com nosso atendimento para atualizar seus dados.')
+        if (
+          this.juvoData?.isSuccess === false &&
+          this.juvoData?.message.includes('Este CPF já está vinculado a outro e-mail')
+        ) {
+          alert(
+            'Este CPF já está vinculado a outro e-mail, Por favor, entre em contato com nosso atendimento para atualizar seus dados.'
+          )
         }
 
         if (this.juvoData?.validationErrors?.body?.cpf_number?._errors?.length > 0) {
-          alert('Por favor preencha um CEP válido.');
+          alert('Por favor preencha um CEP válido.')
         }
 
-        if(this.juvoData?.isSuccess === false && this.juvoData?.message.includes('Esse cpf e email já estão registrados')) {
+        if (
+          this.juvoData?.isSuccess === false &&
+          this.juvoData?.message.includes('Esse cpf e email já estão registrados')
+        ) {
           alert('Esse CPF e E-mail já estão registrados em nosso sistema')
         }
 
-        if(this.juvoData?.isSuccess === false && this.juvoData?.message.includes('CPF')) {
+        if (this.juvoData?.isSuccess === false && this.juvoData?.message.includes('CPF')) {
           alert('CPF Inválido')
         }
 
-
         if (this.juvoData?.validationErrors?.body?.address_postal_code?._errors?.length > 0) {
-          alert('Por favor preencha um CEP válido.');
+          alert('Por favor preencha um CEP válido.')
         }
       } catch (error) {
         this.juvoError = true
@@ -228,21 +242,27 @@ export const useJuvo = defineStore('juvo', {
       }
     },
     async sendAdditionalFormData({ additionalFormData }) {
-      this.juvoLoading = true;
+      this.juvoLoading = true
+
+      additionalFormData.documentNumber = additionalFormData.documentNumber.replace(/\D/g, '');
+      additionalFormData.address.postalCode = additionalFormData.address.postalCode.replace(/\D/g, '');
 
       try {
-        const response = await fetch(`${baseUrl}/v2/simulation/save-additional-customer-info?partner=igoal`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${this.token}`
-          },
-          body: JSON.stringify(additionalFormData)
-        })
+        const response = await fetch(
+          `${baseUrl}/v2/simulation/save-additional-customer-info?partner=igoal`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${this.token}`
+            },
+            body: JSON.stringify(additionalFormData)
+          }
+        )
 
-        this.juvoAdditionalFormData = await response.json();
+        this.juvoAdditionalFormData = await response.json()
 
-        return this.juvoAdditionalFormData.isSuccess;
+        return this.juvoAdditionalFormData.isSuccess
       } catch (error) {
         this.juvoError = true
         console.error('Erro ao enviar o formulário:', error)
@@ -251,5 +271,50 @@ export const useJuvo = defineStore('juvo', {
         this.juvoLoading = false
       }
     },
+    async saveIgoalData({ formData }) {
+      this.juvoLoading = true
+
+      const encryptedUrl = btoa(window.location.href);
+
+      const requestData = {
+        full_name: formData.nome,
+        email: formData.email,
+        postal_code: formData.address_postal_code,
+        birthday: formData.birthdate,
+        mobile_phone: formData.celular.replace(/\D/g, ''),
+        terms: formData.terms,
+        origin: encryptedUrl,
+        extras: {
+          gross_income: formData.renda,
+          professional_class_id: Number(formData.professional_class_id),
+          marital_status_id: Number(formData.marital_status_id),
+          device: {
+            model: formData.device.model,
+            brand_option: this.brand,
+            brand: this.brand,
+            os_version: this.juvoDeviceInfo.osVersion
+          },
+          politically_exposed_person: formData.politically_exposed_person
+        },
+      }
+
+      try {
+        await fetch('https://api.igoaldev.online/api/leads/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(requestData),
+        })
+
+        await this.sendForm({formData})
+      } catch (error) {
+        this.juvoError = true
+        console.error('Erro ao enviar o formulário:', error)
+        alert('Erro ao enviar o formulário. Tente novamente.')
+      } finally {
+        this.juvoLoading = false
+      }
+    }
   }
 })

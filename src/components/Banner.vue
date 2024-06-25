@@ -63,7 +63,7 @@
 
             <div class="input-group mb-3">
               <input class="form-control p-2" v-model="formData.renda" id="renda" type="text" placeholder="Renda"
-                maxlength="11" @input="mascaraRenda" required />
+                maxlength="13" @input="mascaraRenda" required />
             </div>
 
             <div class="button-container d-flex justify-content-center">
@@ -201,7 +201,7 @@
           <div class="form-data">
             <div class="input-group mb-3">
               <input class="form-control p-2" id="documentNumber" v-model="additionalFormData.documentNumber"
-                type="text" placeholder="CPF" required />
+                type="text" placeholder="CPF" @input="mascaraAdditionalCPF" maxlength="14" required />
 
               <input class="form-control p-2" id="payday" v-model="additionalFormData.payday" type="number" min="1"
                 max="30" placeholder="Dia do pagamento" required />
@@ -225,14 +225,17 @@
 
             <div class="input-group mb-3">
               <input class="form-control p-2" id="accountNumber" v-model="additionalFormData.bankDetails.accountNumber"
-                type="text" placeholder="Número da conta" required />
+                type="text" placeholder="Número da conta" maxlength="13" @input="maskAccountNumber" required />
               <input class="form-control p-2" id="agencyNumber" v-model="additionalFormData.bankDetails.agencyNumber"
-                type="text" placeholder="Agência" required />
+                type="text" placeholder="Agência" maxlength="10" @input="validateNumber('agencyNumber')" required />
             </div>
 
             <div class="mb-3">
               <input class="form-control p-2" id="owner" v-model="additionalFormData.bankDetails.owner" type="text"
                 placeholder="Proprietário" required />
+              <div v-if="!isAdditionalNameValid && additionalFormData.bankDetails.owner !== ''"
+                class="text-danger">Nome inválido.
+              </div>
             </div>
 
             <div class="input-group mb-3">
@@ -252,12 +255,12 @@
             </div>
 
             <div class="input-group mb-3">
-              <input class="form-control p-2" id="postalCode" v-model="additionalFormData.address.postalCode"
-                type="text" placeholder="CEP" required />
+              <input class="form-control p-2" id="postalCode" v-model="additionalFormData.address.postalCode" type="tel"
+                placeholder="CEP" maxlength="9" @input="mascaraCEP" required />
               <input class="form-control p-2" id="neighborhood" v-model="additionalFormData.address.neighborhood"
                 type="text" placeholder="Bairro" required />
               <input class="form-control p-2" id="number" v-model="additionalFormData.address.number" type="text"
-                placeholder="Número" required />
+                placeholder="Número" @input="validateNumber('number')" required />
             </div>
 
             <div class="mb-3">
@@ -394,6 +397,9 @@ export default {
     isNameValid() {
       return /^[a-zA-ZÀ-ÿ ]+$/.test(this.formData.nome) && this.formData.nome.trim().split(' ').length >= 2;
     },
+    isAdditionalNameValid() {
+      return /^[a-zA-ZÀ-ÿ ]+$/.test(this.additionalFormData.bankDetails.owner) && this.additionalFormData.bankDetails.owner.trim().split(' ').length >= 2;
+    },
     isEmailValid() {
       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailPattern.test(this.formData.email);
@@ -414,7 +420,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(useJuvo, ['getToken', 'getProfessionalList', 'getMaritalStatus', 'getDeviceInfo', 'getDeviceModels', 'getDeviceBrands', 'setBrand', 'sendForm', 'getBanksList', 'getStateList', 'sendAdditionalFormData']),
+    ...mapActions(useJuvo, ['getToken', 'getProfessionalList', 'getMaritalStatus', 'getDeviceInfo', 'getDeviceModels', 'getDeviceBrands', 'setBrand', 'sendForm', 'getBanksList', 'getStateList', 'sendAdditionalFormData', 'saveIgoalData']),
     nextStep() {
       this.step++;
     },
@@ -473,10 +479,30 @@ export default {
 
       this.formData.cpf = formattedCPF;
     },
+    mascaraAdditionalCPF() {
+      let formattedCPF = this.additionalFormData.documentNumber;
+
+      formattedCPF = formattedCPF.replace(/\D/g, "");
+
+      if (formattedCPF.length > 3) {
+        formattedCPF = formattedCPF.slice(0, 3) + "." + formattedCPF.slice(3);
+      }
+      if (formattedCPF.length > 7) {
+        formattedCPF =
+          formattedCPF.slice(0, 7) + "." + formattedCPF.slice(7);
+      }
+      if (formattedCPF.length > 11) {
+        formattedCPF =
+          formattedCPF.slice(0, 11) + "-" + formattedCPF.slice(11);
+      }
+
+      this.additionalFormData.documentNumber = formattedCPF;
+    },
     mascaraCEP(event) {
       let value = event.target.value.replace(/\D/g, '');
       value = value.replace(/(\d{5})(\d)/, '$1-$2');
       this.formData.address_postal_code = value;
+      this.additionalFormData.address.cep = value;
     },
     mascaraData(event) {
       let value = event.target.value.replace(/\D/g, '');
@@ -555,6 +581,17 @@ export default {
       }
       return isValid;
     },
+    validateName() {
+      const validations = {
+        name: this.isAdditionalNameValid,
+      };
+
+      const isValid = Object.values(validations).every(value => value);
+      if (!isValid) {
+        console.error('Por favor, verifique suas informações:', validations);
+      }
+      return isValid;
+    },
     formatarDataParaEnvio(data) {
       const partes = data.split('/');
       if (partes.length === 3) {
@@ -570,7 +607,7 @@ export default {
       this.formData.renda = this.formData.renda.replace(/\D/g, '');
 
       if (this.validateAll()) {
-        await this.sendForm(formData);
+        await this.saveIgoalData(formData);
 
         const isSuccess = this.juvoData.isSuccess;
         const hasOffers = this.juvoData.data?.propositions?.offers.length > 0;
@@ -587,28 +624,60 @@ export default {
     async submitAdditionalData(additionalFormData) {
       additionalFormData.additionalFormData.personalInfo.maritalStatus = Number(this.additionalFormData.personalInfo.maritalStatus)
       additionalFormData.additionalFormData.personalInfo.educationLevel = Number(this.additionalFormData.personalInfo.educationLevel)
-      
-      const isSuccess = await this.sendAdditionalFormData(additionalFormData);
 
-      if (isSuccess && this.juvoAdditionalFormData?.data?.redirectUrl) {
-        window.location.href = this.juvoAdditionalFormData?.data?.redirectUrl;
-      } else if (isSuccess) {
-        this.step = 4;
+      if (this.validateName()) {
+        const isSuccess = await this.sendAdditionalFormData(additionalFormData);
+
+        if (isSuccess && this.juvoAdditionalFormData?.data?.redirectUrl) {
+          window.location.href = this.juvoAdditionalFormData?.data?.redirectUrl;
+        } else if (isSuccess) {
+          this.step = 4;
+        } else {
+          alert('Erro nas informações. Por favor, entre em contato com nosso atendimento para atualizar seus dados')
+        }
       } else {
-        alert('Erro nas informações. Por favor, entre em contato com nosso atendimento para atualizar seus dados')
+        alert('Por favor, preencha o nome corretamente');
       }
     },
   },
-  async mounted() {
-    await this.getToken();
+  validateNumber(field) {
+    let value = this.additionalFormData[field] || this.additionalFormData.bankDetails[field] || this.additionalFormData.address[field];
 
-    this.getProfessionalList();
-    this.getMaritalStatus();
-    this.getDeviceInfo();
-    this.getDeviceBrands();
-    this.getBanksList();
-    this.getStateList();
+    // Remove non-digit characters
+    value = value.replace(/\D/g, "");
+
+    // Update the corresponding field with the formatted value
+    if (this.additionalFormData[field] !== undefined) {
+      this.additionalFormData[field] = value;
+    } else if (this.additionalFormData.bankDetails[field] !== undefined) {
+      this.additionalFormData.bankDetails[field] = value;
+    } else if (this.additionalFormData.address[field] !== undefined) {
+      this.additionalFormData.address[field] = value;
+    }
   },
+  maskAccountNumber() {
+    let value = this.additionalFormData.bankDetails.accountNumber;
+
+    // Remove non-digit characters
+    value = value.replace(/\D/g, "");
+
+    // Apply the mask: everything except the last digit is considered part of the account number
+    if (value.length > 1) {
+      value = value.slice(0, -1) + '-' + value.slice(-1);
+    }
+
+    this.additionalFormData.bankDetails.accountNumber = value;
+  },
+  async mounted() {
+  await this.getToken();
+
+  this.getProfessionalList();
+  this.getMaritalStatus();
+  this.getDeviceInfo();
+  this.getDeviceBrands();
+  this.getBanksList();
+  this.getStateList();
+},
 };
 </script>
 
