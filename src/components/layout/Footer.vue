@@ -2,12 +2,22 @@
   <footer class="d-flex align-items-center justify-content-center w-100">
     <img src="@/assets/logo.svg" alt="Logo">
     <p>Parceiro autorizado</p>
+    <template v-if="leadID">
+      <iframe :src="`https://igoal.go2cloud.org/aff_l?offer_id=6003&adv_sub=${leadID.lead_id}`" scrolling="no" frameborder="0"
+        width="1" height="1"></iframe>
+    </template>
   </footer>
 </template>
 
 <script>
+import { mapState } from 'pinia';
+import { useJuvo } from '@/stores/juvo';
+
 export default {
-  name: 'FooterLayout'
+  name: 'FooterLayout',
+  computed: {
+    ...mapState(useJuvo, ['leadID'])
+  }
 }
 </script>
 

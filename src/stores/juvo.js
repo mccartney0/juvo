@@ -1,7 +1,9 @@
 import { defineStore } from 'pinia'
 
-const baseUrl = 'https://gateway.juvocredito-dev.com.br/services/bff_partner'
-const partnerToken = 'OlAZhhILOX8PtwzkcJcKeIlJ5SnsDULP'
+// Link de Produção https://bff-partner.juvocredito.com.br
+// Link de Testes https://gateway.juvocredito-dev.com.br/services/bff_partner
+const baseUrl = 'https://bff-partner.juvocredito.com.br'
+const partnerToken = 'c20e7a82ecd58540cb8ed3b03d10bd07'
 
 export const useJuvo = defineStore('juvo', {
   state: () => ({
@@ -19,7 +21,8 @@ export const useJuvo = defineStore('juvo', {
     disableModels: true,
     juvoAdditionalFormData: null,
     juvoBankList: null,
-    juvoStateList: null
+    juvoStateList: null,
+    leadID: null
   }),
   actions: {
     setBrand(value) {
@@ -299,13 +302,15 @@ export const useJuvo = defineStore('juvo', {
       }
 
       try {
-        await fetch('https://api.igoaldev.online/api/leads/', {
+        const response = await fetch('https://api.igoaldev.online/api/leads/prod/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify(requestData),
         })
+
+        this.leadID = await response.json();
 
         await this.sendForm({formData})
       } catch (error) {
