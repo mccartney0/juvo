@@ -2,6 +2,8 @@ import { defineStore } from 'pinia'
 
 // Link de Produção https://bff-partner.juvocredito.com.br
 // Link de Testes https://gateway.juvocredito-dev.com.br/services/bff_partner
+// Token teste const partnerToken = 'OlAZhhILOX8PtwzkcJcKeIlJ5SnsDULP'
+
 const baseUrl = 'https://bff-partner.juvocredito.com.br'
 const partnerToken = 'c20e7a82ecd58540cb8ed3b03d10bd07'
 
