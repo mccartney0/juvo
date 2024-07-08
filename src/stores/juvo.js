@@ -224,6 +224,10 @@ export const useJuvo = defineStore('juvo', {
           alert('Por favor preencha um CEP válido.')
         }
 
+        if (this.juvoData?.validationErrors?.body?.birthdate?._errors?.length > 0) {
+          alert('Por favor insira uma data de nascimento válida válido.')
+        }
+
         if (
           this.juvoData?.isSuccess === false &&
           this.juvoData?.message.includes('Esse cpf e email já estão registrados')
@@ -315,6 +319,10 @@ export const useJuvo = defineStore('juvo', {
         this.leadID = await response.json();
 
         await this.sendForm({formData})
+
+        if(this.leadID.message === 'Invalid mobile phone'){
+          alert('Telefone inválido')
+        }
       } catch (error) {
         this.juvoError = true
         console.error('Erro ao enviar o formulário:', error)

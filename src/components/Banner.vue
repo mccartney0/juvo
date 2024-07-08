@@ -11,7 +11,185 @@
           Use seu celular como garantia!
         </div>
       </div>
+      <!-- Modal -->
+      <div class="modal fade" id="termos-de-uso" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5 text-black" id="exampleModalLabel">Termos de Uso – <a href="juvocred.com"
+                  target="_blank" rel="noopener noreferrer">JuvoCred.com</a></h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-black">
+              <p>
+                <b>
+                  1. Introdução
+                </b>
+              </p>
 
+              <p>
+                Bem-vindo ao <a href="juvocred.com" target="_blank" rel="noopener noreferrer">JuvoCred.com</a>, uma
+                página de crédito desenvolvida pela iGoal em parceria com a Juvo. Estes
+                Termos de Uso explicam como coletamos, utilizamos e protegemos os dados pessoais que você nos fornece.
+                Ao
+                utilizar nossa página, você concorda com os termos aqui descritos.
+              </p>
+
+              <p>
+                <b>
+                  2. Coleta de Dados
+                </b>
+              </p>
+              <p>
+                Para oferecer nossos serviços de crédito, coletamos as seguintes informações:
+              </p>
+
+              <ul>
+                <li>
+                  Nome
+                </li>
+                <li>
+                  Email
+                </li>
+                <li>
+                  Celular
+                </li>
+                <li>
+                  CPF
+                </li>
+                <li>
+                  Data de Nascimento
+                </li>
+                <li>
+                  CEP
+                </li>
+                <li>
+                  Renda
+                </li>
+              </ul>
+
+              <p>
+                <b>
+                  3. Tratamento dos Dados
+                </b>
+              </p>
+              <p>
+                Utilizamos esses dados para:
+              </p>
+
+              <ul>
+                <li>
+                  Avaliar sua elegibilidade para produtos de crédito.
+                </li>
+                <li>
+                  Entrar em contato com você sobre sua solicitação.
+                </li>
+                <li>
+                  Cumprir com obrigações legais e regulatórias.
+                </li>
+              </ul>
+
+              <p>
+                <b>
+                  4. Compartilhamento dos Dados
+                </b>
+              </p>
+              <p>
+                Seus dados poderão ser compartilhados com:
+              </p>
+              <ul>
+                <li>
+                  Instituições financeiras parceiras.
+                </li>
+                <li>
+                  Empresas de análise de crédito.
+                </li>
+                <li>
+                  Órgãos governamentais, quando necessário.
+                </li>
+              </ul>
+
+              <p>
+                <b>
+                  5. Direitos dos Usuários
+                </b>
+              </p>
+
+              <p>
+                Você tem o direito de:
+              </p>
+
+              <ul>
+                <li>
+                  Confirmar a existência do tratamento de seus dados.
+                </li>
+                <li>
+                  Acessar os dados que tratamos sobre você.
+                </li>
+                <li>
+                  Solicitar correção ou atualização de seus dados.
+                </li>
+                <li>
+                  Solicitar a portabilidade de seus dados a outro fornecedor.
+                </li>
+                <li>
+                  Revogar seu consentimento.
+                </li>
+                <li>
+                  Solicitar o bloqueio, eliminação ou anonimização dos seus dados, nas hipóteses permitidas em lei.
+                </li>
+              </ul>
+
+              <p>
+                <b>
+                  6. Segurança dos Dados
+                </b>
+              </p>
+              <p>
+                Implementamos medidas de segurança para proteger seus dados contra acesso não autorizado, uso indevido e
+                divulgação. Seus dados são armazenados em ambientes seguros, com criptografia e monitoramento de acesso.
+              </p>
+
+              <p>
+                <b>
+                  7. Retenção e Descarte dos Dados
+                </b>
+              </p>
+
+              <p>
+                Mantemos seus dados apenas pelo tempo necessário para cumprir os propósitos para os quais foram
+                coletados,
+                exceto quando exigido por lei. Assim que nossa relação com o titular se encerra, descartamos os dados
+                pessoais de maneira segura.
+              </p>
+
+              <p>
+                <b>
+                  8. Alterações nos Termos
+                </b>
+              </p>
+
+              <p>
+                Podemos atualizar estes Termos de Uso periodicamente. Qualquer alteração será comunicada através do
+                nosso
+                site. Recomendamos que você revise os Termos de Uso regularmente para se manter informado sobre nossas
+                práticas.
+              </p>
+
+              <p>
+                <b>
+                  9. Contato
+                </b>
+              </p>
+
+              <p>
+                Para dúvidas ou solicitações relacionadas a estes Termos de Uso, entre em contato conosco pelo email:
+                <a href="mailto:privacidade@igoal.com.br">privacidade@igoal.com.br</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="form" id="simule-agora" :class="step === 3 || step === 4 ? 'd-none' : ''">
         <div class="title mb-4 text-center">Solicitação de Crédito</div>
 
@@ -64,6 +242,21 @@
             <div class="input-group mb-3">
               <input class="form-control p-2" v-model="formData.renda" id="renda" type="text" placeholder="Renda"
                 maxlength="13" @input="mascaraRenda" required />
+            </div>
+
+            <div class="checkboxes-container mb-3 d-flex flex-column gap-2 align-items-center">
+              <div class="form-check d-flex gap-2 justify-content-start align-items-center">
+                <input class="form-check-input" id="terms" v-model="formData.terms" type="checkbox" value=""
+                  name="terms" required />
+                <label class="form-check-label">
+                  Ao acessar/utilizar este site, você aceita as condições dos
+
+                  <button type="button" class="btn-link bg-transparent border-0 text-blue
+                  " data-bs-toggle="modal" data-bs-target="#termos-de-uso">
+                    Termos de uso
+                  </button>
+                </label>
+              </div>
             </div>
 
             <div class="button-container d-flex justify-content-center">
@@ -134,16 +327,6 @@
                     </option>
                   </select>
                 </div>
-              </div>
-            </div>
-
-            <div class="checkboxes-container mb-3 d-flex flex-column gap-2 align-items-center">
-              <div class="form-check d-flex gap-2 justify-content-start align-items-center">
-                <input class="form-check-input" id="terms" v-model="formData.terms" type="checkbox" value=""
-                  name="terms" required />
-                <label class="form-check-label">
-                  Ao acessar/utilizar este site, você aceita as condições dos Termos de uso e Política de Privacidade
-                </label>
               </div>
             </div>
 
@@ -232,9 +415,9 @@
 
             <div class="mb-3">
               <input class="form-control p-2" id="owner" v-model="additionalFormData.bankDetails.owner" type="text"
-                placeholder="Proprietário" required />
-              <div v-if="!isAdditionalNameValid && additionalFormData.bankDetails.owner !== ''"
-                class="text-danger">Nome inválido.
+                placeholder="Nome do Titular da Conta" required />
+              <div v-if="!isAdditionalNameValid && additionalFormData.bankDetails.owner !== ''" class="text-danger">Nome
+                inválido.
               </div>
             </div>
 
@@ -413,7 +596,7 @@ export default {
       return cpfPattern.test(this.formData.cpf);
     },
     firstStepFormValidation() {
-      if (this.formData.nome !== '' && this.formData.email !== '' && this.formData.celular !== '' && this.formData.cpf !== '' && this.formData.birthdate !== '' && this.formData.cep !== '' && this.formData.renda !== '') {
+      if (this.formData.terms === true && this.formData.nome !== '' && this.formData.email !== '' && this.formData.celular !== '' && this.formData.cpf !== '' && this.formData.birthdate !== '' && this.formData.cep !== '' && this.formData.renda !== '') {
         return true
       }
       return false
@@ -639,45 +822,58 @@ export default {
         alert('Por favor, preencha o nome corretamente');
       }
     },
-  },
-  validateNumber(field) {
-    let value = this.additionalFormData[field] || this.additionalFormData.bankDetails[field] || this.additionalFormData.address[field];
+    updateAdditionalFormData() {
+      this.additionalFormData.documentNumber = this.formData.cpf;
+      this.additionalFormData.address.postalCode = this.formData.address_postal_code;
+      this.additionalFormData.personalInfo.maritalStatus = this.formData.marital_status_id;
+    },
+    validateNumber(field) {
+      let value = this.additionalFormData[field] || this.additionalFormData.bankDetails[field] || this.additionalFormData.address[field];
 
-    // Remove non-digit characters
-    value = value.replace(/\D/g, "");
+      // Remove non-digit characters
+      value = value.replace(/\D/g, "");
 
-    // Update the corresponding field with the formatted value
-    if (this.additionalFormData[field] !== undefined) {
-      this.additionalFormData[field] = value;
-    } else if (this.additionalFormData.bankDetails[field] !== undefined) {
-      this.additionalFormData.bankDetails[field] = value;
-    } else if (this.additionalFormData.address[field] !== undefined) {
-      this.additionalFormData.address[field] = value;
-    }
-  },
-  maskAccountNumber() {
-    let value = this.additionalFormData.bankDetails.accountNumber;
+      // Update the corresponding field with the formatted value
+      if (this.additionalFormData[field] !== undefined) {
+        this.additionalFormData[field] = value;
+      } else if (this.additionalFormData.bankDetails[field] !== undefined) {
+        this.additionalFormData.bankDetails[field] = value;
+      } else if (this.additionalFormData.address[field] !== undefined) {
+        this.additionalFormData.address[field] = value;
+      }
+    },
+    maskAccountNumber() {
+      let value = this.additionalFormData.bankDetails.accountNumber;
 
-    // Remove non-digit characters
-    value = value.replace(/\D/g, "");
+      // Remove non-digit characters
+      value = value.replace(/\D/g, "");
 
-    // Apply the mask: everything except the last digit is considered part of the account number
-    if (value.length > 1) {
-      value = value.slice(0, -1) + '-' + value.slice(-1);
-    }
+      // Apply the mask: everything except the last digit is considered part of the account number
+      if (value.length > 1) {
+        value = value.slice(0, -1) + '-' + value.slice(-1);
+      }
 
-    this.additionalFormData.bankDetails.accountNumber = value;
+      this.additionalFormData.bankDetails.accountNumber = value;
+    },
   },
   async mounted() {
-  await this.getToken();
+    await this.getToken();
 
-  this.getProfessionalList();
-  this.getMaritalStatus();
-  this.getDeviceInfo();
-  this.getDeviceBrands();
-  this.getBanksList();
-  this.getStateList();
-},
+    this.getProfessionalList();
+    this.getMaritalStatus();
+    this.getDeviceInfo();
+    this.getDeviceBrands();
+    this.getBanksList();
+    this.getStateList();
+  },
+  watch: {
+    formData: {
+      handler(newVal) {
+        this.updateAdditionalFormData();
+      },
+      deep: true
+    }
+  }
 };
 </script>
 
