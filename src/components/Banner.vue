@@ -787,7 +787,7 @@ export default {
     },
     async submitData(formData) {
       this.formData.birthdate = this.formatarDataParaEnvio(this.formData.birthdate);
-      this.formData.renda = this.formData.renda.replace(/\D/g, '');
+      this.formData.renda = (Number(this.formData.renda.replace(/\D/g, '')) / 100);
 
       if (this.validateAll()) {
         await this.saveIgoalData(formData);
