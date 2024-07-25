@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia'
 
-// Link de Produção https://bff-partner.juvocredito.com.br
-// Link de Testes https://gateway.juvocredito-dev.com.br/services/bff_partner
-// Token teste const partnerToken = 'OlAZhhILOX8PtwzkcJcKeIlJ5SnsDULP'
-
+// Variáveis de Produção
 const baseUrl = 'https://bff-partner.juvocredito.com.br'
 const partnerToken = 'c20e7a82ecd58540cb8ed3b03d10bd07'
+
+// Variáveis de Teste
+// const baseUrl = 'https://gateway.juvocredito-dev.com.br/services/bff_partner'
+// const partnerToken = 'OlAZhhILOX8PtwzkcJcKeIlJ5SnsDULP'
 
 export const useJuvo = defineStore('juvo', {
   state: () => ({
@@ -200,6 +201,11 @@ export const useJuvo = defineStore('juvo', {
 
         this.juvoData = await response.json()
 
+        const operationId = this.juvoData?.data?.operationId;
+        if (operationId) {
+          this.updateUserLead(operationId)
+        }
+
         if (
           this.juvoData?.isSuccess === false &&
           this.juvoData?.message.includes(
@@ -286,6 +292,7 @@ export const useJuvo = defineStore('juvo', {
       const encryptedUrl = btoa(window.location.href);
 
       const requestData = {
+        product: 'juvocred',
         full_name: formData.nome,
         email: formData.email,
         postal_code: formData.address_postal_code,
@@ -329,6 +336,28 @@ export const useJuvo = defineStore('juvo', {
         alert('Erro ao enviar o formulário. Tente novamente.')
       } finally {
         this.juvoLoading = false
+      }
+    },
+    async updateUserLead(operationId) {
+      const fullUrl = `https://api.igoaldev.online/api/leads/prod/update.php?id=${this.leadID.lead_id}&operationid=${operationId}`;
+    
+      try {
+        const response = await fetch(fullUrl, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+    
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.log(`Erro ${response.status}: ${errorData.message}`);
+        }
+    
+        const responseData = await response.json();
+        return responseData;
+      } catch (error) {
+        console.error('Erro ao atualizar o usuário:', error);
       }
     }
   }

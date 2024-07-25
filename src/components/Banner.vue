@@ -787,8 +787,10 @@ export default {
     },
     async submitData(formData) {
       this.formData.birthdate = this.formatarDataParaEnvio(this.formData.birthdate);
-      const renda = (Number(this.formData.renda.replace(/\D/g, '')) / 100);
-      this.formData.renda = renda.toString();
+      if (this.formData.renda.includes('R$')) {
+        const renda = Number(this.formData.renda.replace(/\D/g, '')) / 100;
+        this.formData.renda = renda.toString();
+      }
 
       if (this.validateAll()) {
         await this.saveIgoalData(formData);
