@@ -301,6 +301,7 @@ export const useJuvo = defineStore('juvo', {
         terms: formData.terms,
         origin: encryptedUrl,
         extras: {
+          cpf: formData.cpf,
           gross_income: formData.renda,
           professional_class_id: Number(formData.professional_class_id),
           marital_status_id: Number(formData.marital_status_id),
