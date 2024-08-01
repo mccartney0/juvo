@@ -807,6 +807,12 @@ export default {
         alert('Por favor, preencha suas informações corretamente');
       }
     },
+    getUrlParameter(name) {
+      name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+      let regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+      let results = regex.exec(location.search);
+      return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    },
     async submitAdditionalData(additionalFormData) {
       additionalFormData.additionalFormData.personalInfo.maritalStatus = Number(this.additionalFormData.personalInfo.maritalStatus)
       additionalFormData.additionalFormData.personalInfo.educationLevel = Number(this.additionalFormData.personalInfo.educationLevel)
@@ -815,7 +821,12 @@ export default {
         const isSuccess = await this.sendAdditionalFormData(additionalFormData);
 
         if (isSuccess && this.juvoAdditionalFormData?.data?.redirectUrl) {
-          window.location.href = this.juvoAdditionalFormData?.data?.redirectUrl;
+          // Pega o valor de 'utm_content' e armazena na variável 'transaction_id'
+          let transaction_id = this.getUrlParameter('utm_content');
+
+          // Exibe o valor no console (para testes)
+          console.log(transaction_id);
+          window.location.href = this.juvoAdditionalFormData?.data?.redirectUrl + '&transaction_id=' + transaction_id;
         } else if (isSuccess) {
           this.step = 4;
         } else {
