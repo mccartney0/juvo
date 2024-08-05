@@ -825,7 +825,6 @@ export default {
           let transaction_id = this.getUrlParameter('utm_content');
 
           // Exibe o valor no console (para testes)
-          console.log(transaction_id);
           window.location.href = this.juvoAdditionalFormData?.data?.redirectUrl + '&transaction_id=' + transaction_id;
         } else if (isSuccess) {
           this.step = 4;
@@ -869,6 +868,22 @@ export default {
 
       this.additionalFormData.bankDetails.accountNumber = value;
     },
+    webSiteUrl() {
+      const url = new URL(window.location.href);
+      const userDataParam = url.searchParams.get('userData');
+
+      if (userDataParam) {
+        const decodedUserData = atob(userDataParam);
+        const userParams = new URLSearchParams(decodedUserData);
+        
+        this.formData.nome = userParams.get('nome') || '';
+        this.formData.email = userParams.get('email') || '';
+        this.formData.cpf = userParams.get('cpf') || '';
+        this.formData.address_postal_code = userParams.get('cep') || '';
+        this.formData.celular = userParams.get('celular') || '';
+        this.formData.birthdate = userParams.get('dataNascimento') || '';
+      }
+    },
   },
   async mounted() {
     await this.getToken();
@@ -879,6 +894,7 @@ export default {
     this.getDeviceBrands();
     this.getBanksList();
     this.getStateList();
+    this.webSiteUrl();
   },
   watch: {
     formData: {
