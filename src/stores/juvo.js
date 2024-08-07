@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia'
 
 // Variáveis de Produção
-const baseUrl = 'https://bff-partner.juvocredito.com.br'
-const partnerToken = 'c20e7a82ecd58540cb8ed3b03d10bd07'
+// const baseUrl = 'https://bff-partner.juvocredito.com.br'
+// const partnerToken = 'c20e7a82ecd58540cb8ed3b03d10bd07'
 
 // Variáveis de Teste
-// const baseUrl = 'https://gateway.juvocredito-dev.com.br/services/bff_partner'
-// const partnerToken = 'OlAZhhILOX8PtwzkcJcKeIlJ5SnsDULP'
+const baseUrl = 'https://gateway.juvocredito-dev.com.br/services/bff_partner'
+const partnerToken = 'OlAZhhILOX8PtwzkcJcKeIlJ5SnsDULP'
 
 export const useJuvo = defineStore('juvo', {
   state: () => ({
@@ -248,6 +248,10 @@ export const useJuvo = defineStore('juvo', {
         if (this.juvoData?.validationErrors?.body?.address_postal_code?._errors?.length > 0) {
           alert('Por favor preencha um CEP válido.')
         }
+
+        formData.loanId = this.juvoData?.data?.loanId;
+
+        await this.saveIgoalData({formData})
       } catch (error) {
         this.juvoError = true
         console.error('Erro ao enviar o formulário:', error)
@@ -299,6 +303,7 @@ export const useJuvo = defineStore('juvo', {
         birthday: formData.birthdate,
         mobile_phone: formData.celular.replace(/\D/g, ''),
         terms: formData.terms,
+        loan_id: formData.loanId,
         origin: encryptedUrl,
         extras: {
           cpf: formData.cpf,
@@ -325,8 +330,6 @@ export const useJuvo = defineStore('juvo', {
         })
 
         this.leadID = await response.json();
-
-        await this.sendForm({formData})
 
         if(this.leadID.message === 'Invalid mobile phone'){
           alert('Telefone inválido')

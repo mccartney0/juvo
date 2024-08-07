@@ -357,7 +357,7 @@
 
       <!-- Step 3 Additional data -->
       <div v-if="step === 3" class="form additional-form-data" :class="step === 3 ? 'd-flex' : 'd-none'">
-        <div v-if="!juvoData?.data?.propositions?.offers && !juvoData?.data?.propositions?.offers.length > 0"
+        <div v-if="juvoData?.data?.propositions?.offers && juvoData?.data?.propositions?.offers.length > 0"
           class="offers d-flex flex-column gap-2 align-items-center">
           <span class="fs-2 text-center">
             Melhor oferta disponível
@@ -365,17 +365,17 @@
 
           <div class="offer-details d-flex gap-5">
             <div class="first-value">
-              <div class="fs-6 text-center">Quantidade de Parcelas: <b style="color:#dd3e84">{{
+              <div class="fs-6 text-center">Quantidade Máxima de Parcelas: <b style="color:#dd3e84">{{
                 juvoData?.data?.propositions?.offers[0]?.installmentQuantity }}</b>
               </div>
-              <div class="fs-6 text-center">Taxa de Juros (%): <b style="color:#dd3e84">{{
+              <div class="fs-6 text-center">Máxima Taxa de Juros (%): <b style="color:#dd3e84">{{
                 juvoData?.data?.propositions?.offers[0]?.rateInPercentage }}%</b></div>
             </div>
             <div class="second-value">
               <div class="fs-6 text-center">Valor Mínimo do Empréstimo: R$ <b style="color:#dd3e84">{{
-                juvoData?.data?.propositions?.offers[0]?.minLoanAmount.toFixed(2) }}</b></div>
+                juvoData?.data?.propositions?.minOfferAmount.toFixed(2) }}</b></div>
               <div class="fs-6 text-center">Valor Máximo do Empréstimo: R$ <b style="color:#dd3e84">{{
-                juvoData?.data?.propositions?.offers[0]?.maxLoanAmount.toFixed(2) }}</b></div>
+                juvoData?.data?.propositions?.maxOfferAmount.toFixed(2) }}</b></div>
             </div>
           </div>
         </div>
@@ -793,7 +793,7 @@ export default {
       }
 
       if (this.validateAll()) {
-        await this.saveIgoalData(formData);
+        await this.sendForm(formData);
 
         const isSuccess = this.juvoData.isSuccess;
         const hasOffers = this.juvoData.data?.propositions?.offers.length > 0;
