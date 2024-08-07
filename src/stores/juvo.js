@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia'
 
 // Variáveis de Produção
-// const baseUrl = 'https://bff-partner.juvocredito.com.br'
-// const partnerToken = 'c20e7a82ecd58540cb8ed3b03d10bd07'
+const baseUrl = 'https://bff-partner.juvocredito.com.br'
+const partnerToken = 'c20e7a82ecd58540cb8ed3b03d10bd07'
 
 // Variáveis de Teste
-const baseUrl = 'https://gateway.juvocredito-dev.com.br/services/bff_partner'
-const partnerToken = 'OlAZhhILOX8PtwzkcJcKeIlJ5SnsDULP'
+// const baseUrl = 'https://gateway.juvocredito-dev.com.br/services/bff_partner'
+// const partnerToken = 'OlAZhhILOX8PtwzkcJcKeIlJ5SnsDULP'
 
 export const useJuvo = defineStore('juvo', {
   state: () => ({
